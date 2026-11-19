@@ -1,0 +1,74 @@
+# Render Blueprint: one paid web service (API + built React app) and one paid PostgreSQL database.
+# Create it from the Render dashboard: New > Blueprint > pick this repository.
+# Secrets marked `sync: false` are entered once in the dashboard and are never stored in Git.
+
+databases:
+  - name: savings-db
+    # Paid Postgres: daily backups, point-in-time recovery, no 30-day expiry (the free tier deletes data).
+    # Upgrade to basic-1gb / pro-* later from the dashboard without data loss as the group grows.
+    plan: basic-1gb
+    databaseName: savings
+    user: savings
+    region: frankfurt
+    ipAllowList: []   # private network access only (the web service connects over Render's internal network)
+
+services:
+  - type: web
+    name: savings-system
+    runtime: node
+    # Paid instance: always on, so the daily job, reminders and M-Pesa callbacks are never missed (free tier sleeps).
+    plan: starter
+    region: frankfurt   # keep in the same region as the database
+    buildCommand: npm ci --include=dev && npm run build
+    preDeployCommand: npm run migrate && npm run seed
+    startCommand: npm run start
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NODE_VERSION
+        value: 22
+      - key: DATABASE_URL
+        fromDatabase:
+          name: savings-db
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+      - key: MPESA_CALLBACK_SECRET
+        generateValue: true
+      # Generate with: openssl rand -hex 32   (store a copy safely: losing it makes stored National IDs unreadable)
+      - key: FIELD_ENCRYPTION_KEY
+        sync: false
+      # https://your-service-name.onrender.com, or your custom domain. Must be https for M-Pesa.
+      - key: APP_BASE_URL
+        sync: false
+      - key: GROUP_NAME
+        value: Friends Self Help Group
+      # First super admin, created only if no users exist. Change the password at first login.
+      - key: SEED_ADMIN_EMAIL
+        sync: false
+      - key: SEED_ADMIN_PASSWORD
+        sync: false
+      # Safaricom Daraja (leave MPESA_ENV=sandbox until you go live)
+      - key: MPESA_ENV
+        value: sandbox
+      - key: MPESA_CONSUMER_KEY
+        sync: false
+      - key: MPESA_CONSUMER_SECRET
+        sync: false
+      - key: MPESA_SHORTCODE
+        sync: false
+      - key: MPESA_PASSKEY
+        sync: false
+      - key: MPESA_TRANSACTION_TYPE
+        value: CustomerPayBillOnline   # CustomerBuyGoodsOnline if the group collects on a Till
+      - key: MPESA_TILL
+        sync: false
+      # Africa's Talking SMS (optional; in-app notifications work without it)
+      - key: AT_USERNAME
+        sync: false
+      - key: AT_API_KEY
+        sync: false
+      - key: AT_SENDER_ID
+        sync: false

@@ -1,0 +1,24 @@
+{
+  "name": "savings-system",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Members' Savings and Group Management System",
+  "workspaces": [
+    "server",
+    "client"
+  ],
+  "scripts": {
+    "dev:server": "npm run dev -w server",
+    "dev:client": "npm run dev -w client",
+    "build": "npm run build -w client && npm run build -w server",
+    "start": "npm run start -w server",
+    "migrate": "npm run migrate -w server",
+    "test": "npm run test -w server",
+    "seed": "npm run seed -w server",
+    "rekey": "npm run rekey -w server",
+    "reset-records": "npm run reset-records -w server"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
