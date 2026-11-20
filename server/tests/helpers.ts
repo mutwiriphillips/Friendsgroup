@@ -15,7 +15,7 @@ export async function resetDb() {
              fines, fine_ledger, meetings, attendance, withdrawals, withdrawal_approvals, income, expenditure,
              payment_submissions, submission_events, statement_batches, statement_lines, reconciliation_periods,
              discrepancies, announcements, documents, stored_files, message_outbox RESTART IDENTITY CASCADE`);
-  await pool.query(`DELETE FROM system_settings WHERE key IN ('auto_fines', 'admin_managed')`); // tests start with automatic fines on (the production default after migration is suspended)
+  await pool.query(`DELETE FROM system_settings WHERE key IN ('auto_fines', 'admin_managed', 'hide_owed')`); // tests start with automatic fines on (the production default after migration is suspended)
   // CASCADE also clears rule_versions (obligations reference it), so restore the default group rules.
   await pool.query(`TRUNCATE rule_versions RESTART IDENTITY CASCADE`);
   await pool.query(

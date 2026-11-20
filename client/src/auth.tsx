@@ -2,7 +2,7 @@ import { createContext, useCallback, useContext, useEffect, useState, type React
 import { get, getToken, post, setToken } from './api';
 
 export type Role = 'super_admin' | 'chairperson' | 'treasurer' | 'secretary' | 'member';
-export interface Me { id: string; email: string | null; role: Role; member_id: string | null; must_change_password: boolean; full_name: string | null; membership_no: string | null; admin_managed?: boolean }
+export interface Me { id: string; email: string | null; role: Role; member_id: string | null; must_change_password: boolean; full_name: string | null; membership_no: string | null; admin_managed?: boolean; hide_owed?: boolean }
 interface Ctx { me: Me | null; loading: boolean; login: (id: string, pw: string) => Promise<Me>; logout: () => void; refresh: () => Promise<void> }
 const C = createContext<Ctx>(null as never);
 export const useAuth = () => useContext(C);

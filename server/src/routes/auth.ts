@@ -74,7 +74,7 @@ authRouter.get(
          FROM users u LEFT JOIN members m ON m.id = u.member_id WHERE u.id = $1`,
       [req.user!.id],
     );
-    res.json({ ...rows[0], admin_managed: await isAdminManaged(pool) });
+    res.json({ ...rows[0], admin_managed: await isAdminManaged(pool), hide_owed: Boolean((await pool.query(`SELECT value FROM system_settings WHERE key = 'hide_owed'`)).rows[0]?.value?.enabled) });
   }),
 );
 

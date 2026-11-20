@@ -117,7 +117,7 @@ adminRouter.post(
   }),
 );
 
-const SETTING_KEYS = ['group_name', 'withdrawal_approval_levels', 'withdrawal_min_cents', 'notification_reminder_days_before', 'auto_fines', 'admin_managed'] as const;
+const SETTING_KEYS = ['group_name', 'withdrawal_approval_levels', 'withdrawal_min_cents', 'notification_reminder_days_before', 'auto_fines', 'admin_managed', 'hide_owed'] as const;
 adminRouter.get('/settings', requirePermission('settings.rules', 'finance.read'), h(async (_req, res) => {
   res.json((await pool.query(`SELECT key, value FROM system_settings WHERE key = ANY($1)`, [SETTING_KEYS])).rows);
 }));
@@ -133,6 +133,7 @@ adminRouter.put(
       withdrawal_min_cents: z.number().int().min(0),
       notification_reminder_days_before: z.number().int().min(0).max(14),
       admin_managed: z.object({ enabled: z.boolean() }),
+      hide_owed: z.object({ enabled: z.boolean() }),
       auto_fines: z.object({ enabled: z.boolean(), from: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).nullable() }).refine((v) => !v.enabled || v.from, 'Choose the date automatic fines start from'),
     };
     const { value, reason } = z.object({ value: schemas[key]!, reason: z.string().trim().min(3) }).parse(req.body);

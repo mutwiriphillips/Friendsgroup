@@ -86,7 +86,7 @@ function PayModal({ purpose, onClose, onDone }: { purpose: Purpose; onClose: () 
 }
 
 export default function MemberDashboard() {
-  const managed = Boolean(useAuth().me?.admin_managed);
+  const managed = Boolean(useAuth().me?.hide_owed);
   const { data: s, loading, error, reload } = useApi<any>('/me/summary');
   const ob = useApi<any[]>('/me/obligations');
   const [pay, setPay] = useState<Purpose | null>(null);

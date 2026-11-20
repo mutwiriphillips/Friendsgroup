@@ -18,7 +18,7 @@ export default function MemberPayments() {
   const rows = useMemo(() => (data ?? []).filter((r) => `${r.full_name} ${r.membership_no}`.toLowerCase().includes(q.toLowerCase())), [data, q]);
   if (error) return <ErrorBox msg={error} />;
   if (!data) return <Loading />;
-  const managed = Boolean(me?.admin_managed);
+  const managed = Boolean(me?.hide_owed);
   const owedOf = (r: any) => Number(r.owed_contributions_cents) + Number(r.penalties_outstanding_cents);
   const sum = (k: string) => rows.reduce((a, r) => a + Number(r[k]), 0);
   return (

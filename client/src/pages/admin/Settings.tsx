@@ -41,6 +41,8 @@ function AdminManaged() {
   const act = useAction();
   const on = Boolean(settings.data?.find((x) => x.key === 'admin_managed')?.value?.enabled);
   const canEdit = me?.role === 'super_admin';
+  const hide = Boolean(settings.data?.find((x) => x.key === 'hide_owed')?.value?.enabled);
+  const toggleHide = () => { const r = window.prompt(hide ? 'Reason for showing amounts owed?' : 'Reason for hiding amounts owed?'); if (r && r.trim().length >= 3) void act.run(async () => { await put('/admin/settings/hide_owed', { value: { enabled: !hide }, reason: r.trim() }); await settings.reload(); window.location.reload(); return true; }, 'Saved.'); };
   const toggle = () => { const r = window.prompt(on ? 'Reason for switching administrator-managed accounts OFF?' : 'Reason for switching administrator-managed accounts ON?'); if (r && r.trim().length >= 3) void act.run(async () => { await put('/admin/settings/admin_managed', { value: { enabled: !on }, reason: r.trim() }); await settings.reload(); window.location.reload(); return true; }, 'Saved.'); };
   return (
     <div className={`card space-y-2 ${on ? 'border-brand-300 bg-brand-50' : ''}`}>
@@ -48,6 +50,11 @@ function AdminManaged() {
         <div><b>Administrator-managed accounts: {on ? <span className="text-emerald-700">ON</span> : <span className="text-slate-600">OFF</span>}</b>
           <p className="text-sm text-slate-600">{on ? 'The administrator decides what each member owes. Amounts owed are not shown, deposits are not split automatically, and no automatic overdue marking, fines or reminders run. A month\'s contribution falls due on the deadline day of the following month.' : 'The system works out what is owed and applies deposits automatically.'}</p></div>
         {canEdit && <button className="btn-ghost" disabled={act.busy} onClick={toggle}>{on ? 'Switch off' : 'Switch on'}</button>}
+      </div>
+      <div className="flex flex-wrap items-center justify-between gap-2 border-t border-slate-200 pt-2">
+        <div><b>Amounts owed: {hide ? <span className="text-slate-600">HIDDEN</span> : <span className="text-emerald-700">SHOWN</span>}</b>
+          <p className="text-sm text-slate-600">{hide ? 'Unpaid months and amounts owed are hidden on the member portal and the admin screens.' : 'Unpaid months and amounts owed (from the invoices the administrator has raised) are shown to members and officials.'}</p></div>
+        {canEdit && <button className="btn-ghost" disabled={act.busy} onClick={toggleHide}>{hide ? 'Show amounts owed' : 'Hide amounts owed'}</button>}
       </div>
       <ErrorBox msg={act.error} /><Notice msg={act.ok} />
     </div>

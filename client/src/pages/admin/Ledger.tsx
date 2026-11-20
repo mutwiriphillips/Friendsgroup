@@ -29,7 +29,7 @@ function CellModal({ sel, onClose, onDone }: { sel: Sel; onClose: () => void; on
 const KIND_LABEL: Record<string, string> = { contribution: 'Contribution', late_fine: 'Late fine', meeting_fine: 'Missing-meeting fine', other_fine: 'Penalty' };
 
 export function PaymentModal({ members, preset, onClose, onDone, onAllocate }: { members: any[]; preset?: string; onClose: () => void; onDone: () => void; onAllocate?: (memberId: string) => void }) {
-  const managed = Boolean(useAuth().me?.admin_managed);
+  const managed = Boolean(useAuth().me?.hide_owed);
   const today = new Date(Date.now() + 3 * 3600e3).toISOString().slice(0, 10);
   const [f, setF] = useState({ memberId: preset ?? '', amount: '', paidOn: today, message: '', code: '' });
   const [owed, setOwed] = useState<any>(null);
@@ -72,7 +72,7 @@ export function PaymentModal({ members, preset, onClose, onDone, onAllocate }: {
 
 /** The administrator approves which invoices a received payment pays. Nothing is allocated automatically. */
 export function AllocateModal({ members, preset, onClose, onDone }: { members: any[]; preset?: string; onClose: () => void; onDone: () => void }) {
-  const managed = Boolean(useAuth().me?.admin_managed);
+  const managed = Boolean(useAuth().me?.hide_owed);
   const [memberId, setMemberId] = useState(preset ?? '');
   const [payId, setPayId] = useState('');
   const [picked, setPicked] = useState<Set<string>>(new Set());
@@ -148,7 +148,7 @@ export function AllocateModal({ members, preset, onClose, onDone }: { members: a
 }
 
 export function RaiseInvoiceModal({ members, preset, onClose, onDone }: { members: any[]; preset?: string; onClose: () => void; onDone: () => void }) {
-  const managed = Boolean(useAuth().me?.admin_managed);
+  const managed = Boolean(useAuth().me?.hide_owed);
   const opts = useApi<any>('/admin/invoice-options');
   const thisMonth = new Date(Date.now() + 3 * 3600e3).toISOString().slice(0, 7);
   const [f, setF] = useState({ memberId: preset ?? '', kind: 'contribution', month: thisMonth, amount: '', meetingId: '', all: false, lateFine: true, note: '' });
